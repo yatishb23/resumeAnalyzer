@@ -9,7 +9,7 @@ import { ScoreProvider } from "@/components/Context/FileData";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "ResumeAI - Smart Resume Analyzer",
+  title: "ScaleUp",
   description: "AI-powered resume analysis and optimization tool",
 };
 

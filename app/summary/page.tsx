@@ -14,22 +14,6 @@ const ResumeSummaryPage: React.FC = () => {
         description: string;
     }
 
-    interface SummaryExample {
-        level: string;
-        example: string;
-    }
-
-    interface KeyElement {
-        title: string;
-        content: string;
-        example: string;
-    }
-
-    interface Tip {
-        tip: string;
-        description: string;
-    }
-
     const features: Feature[] = [
         { icon: <Target className="h-6 w-6 text-primary" />, title: "Captures Attention", description: "Grabs the employer's interest in the first few seconds" },
         { icon: <BookOpen className="h-6 w-6 text-primary" />, title: "Showcases Value", description: "Highlights your most relevant qualifications and achievements" },

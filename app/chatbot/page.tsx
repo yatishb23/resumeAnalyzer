@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { Send, X, File} from "lucide-react";
+import { Send, X, File } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import TextareaAutosize from "react-textarea-autosize";
 import { useTheme } from "@/components/theme";
@@ -54,11 +54,10 @@ function ChatBotCard() {
     let botMessageIndex: number;
 
     try {
-      setMessages((prev: any) => {
-        const updated = [
-          ...prev,
-          { text: "", sender: "bot", isComplete: false },
-        ];
+      // Add a new message from the bot with initial empty text.
+      setMessages((prev: Message[]): Message[] => {
+        const newMsg: Message = { text: "", sender: "bot", isComplete: false };
+        const updated = [...prev, newMsg];
         botMessageIndex = updated.length - 1;
         return updated;
       });
@@ -66,11 +65,12 @@ function ChatBotCard() {
       const result = await chat.sendMessageStream(userMessage);
       let accumulatedText = "";
 
+      // Update the bot message text as chunks arrive.
       for await (const chunk of result.stream) {
         const chunkText = chunk.text();
         accumulatedText += chunkText;
 
-        setMessages((prev) => {
+        setMessages((prev: Message[]): Message[] => {
           const updated = [...prev];
           if (updated[botMessageIndex]) {
             updated[botMessageIndex].text = accumulatedText;
@@ -79,7 +79,8 @@ function ChatBotCard() {
         });
       }
 
-      setMessages((prev) => {
+      // Mark the bot message as complete.
+      setMessages((prev: Message[]): Message[] => {
         const updated = [...prev];
         if (updated[botMessageIndex]) {
           updated[botMessageIndex].isComplete = true;
@@ -88,7 +89,7 @@ function ChatBotCard() {
       });
     } catch (error) {
       console.error("Error generating response:", error);
-      setMessages((prev) => [
+      setMessages((prev: Message[]): Message[] => [
         ...prev,
         {
           text: "Sorry, I encountered an error. Please try again.",
@@ -110,10 +111,8 @@ function ChatBotCard() {
   return (
     <Card
       className={cn(
-        " fixed w-full h-[690px] flex flex-col shadow-xl border mt-16",
-        theme === "dark"
-          ? "bg-black border-gray-800"
-          : "bg-white border-gray-200"
+        "fixed w-full h-[690px] flex flex-col shadow-xl border mt-16",
+        theme === "dark" ? "bg-black border-gray-800" : "bg-white border-gray-200"
       )}
     >
       <CardHeader className="flex-shrink-0 flex flex-row items-center justify-between p-4">
@@ -132,9 +131,7 @@ function ChatBotCard() {
           {messages.map((msg, index) => (
             <div
               key={index}
-              className={`flex ${
-                msg.sender === "user" ? "justify-end" : "justify-start"
-              }`}
+              className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
                 className={cn(
@@ -147,7 +144,7 @@ function ChatBotCard() {
                       )
                 )}
               >
-                <MarkMessage text={msg.text}/>
+                <MarkMessage text={msg.text} />
               </div>
             </div>
           ))}
@@ -170,17 +167,13 @@ function ChatBotCard() {
       <div
         className={cn(
           "border-t p-4 sticky bottom-0",
-          theme === "dark"
-            ? "bg-black border-gray-800"
-            : "bg-white border-gray-200"
+          theme === "dark" ? "bg-black border-gray-800" : "bg-white border-gray-200"
         )}
       >
         <div
           className={cn(
             "relative flex flex-col w-full rounded-lg transition-colors",
-            theme === "dark"
-              ? "bg-gray-900 border-gray-700"
-              : "bg-gray-50 border-gray-200"
+            theme === "dark" ? "bg-gray-900 border-gray-700" : "bg-gray-50 border-gray-200"
           )}
         >
           {file && (
@@ -190,27 +183,9 @@ function ChatBotCard() {
                 theme === "dark" ? "bg-gray-800" : "bg-gray-100"
               )}
             >
-              <File
-                className={cn(
-                  "h-6 w-6",
-                  theme === "dark" ? "text-gray-400" : "text-gray-600"
-                )}
-              />
-              <span
-                className={cn(
-                  "text-sm truncate max-w-full",
-                  theme === "dark" ? "text-gray-300" : "text-gray-600"
-                )}
-              >
-                {file.name}
-              </span>
-              <button
-                onClick={removeAttachment}
-                className={cn(
-                  "hover:text-gray-200",
-                  theme === "dark" ? "text-gray-400" : "text-gray-500"
-                )}
-              >
+              <File className="h-6 w-6 text-gray-400" />
+              <span className="text-sm truncate max-w-full text-gray-600">{file.name}</span>
+              <button onClick={removeAttachment} className="text-gray-500 hover:text-gray-700">
                 <X size={16} />
               </button>
             </div>
@@ -219,27 +194,15 @@ function ChatBotCard() {
           <div className="relative flex items-center w-full">
             <label
               htmlFor="file-input"
-              className={cn(
-                "absolute left-4 top-1/2 -translate-y-1/2 cursor-pointer",
-                theme === "dark" ? "text-gray-400" : "text-gray-500"
-              )}
+              className="absolute left-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
             >
               <File className="h-5 w-5" />
             </label>
 
-            <input
-              type="file"
-              id="file-input"
-              className="hidden"
-              onChange={handleAttachment}
-            />
+            <input type="file" id="file-input" className="hidden" onChange={handleAttachment} />
 
             <TextareaAutosize
-              className={cn(
-                "pl-12 flex-grow resize-none bg-transparent py-3 focus:outline-none",
-                "placeholder-gray-400 disabled:opacity-50",
-                theme === "dark" ? "text-gray-100" : "text-gray-800"
-              )}
+              className="pl-12 flex-grow resize-none bg-transparent py-3 focus:outline-none placeholder-gray-400 disabled:opacity-50 text-gray-800"
               placeholder="Send a message or drop a file..."
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
@@ -252,13 +215,7 @@ function ChatBotCard() {
             <button
               onClick={handleSend}
               disabled={isLoading}
-              className={cn(
-                "flex items-center justify-center h-10 w-10 mr-3",
-                "disabled:opacity-50 transition-colors",
-                theme === "dark"
-                  ? "text-gray-400 hover:text-gray-200"
-                  : "text-gray-500 hover:text-gray-700"
-              )}
+              className="flex items-center justify-center h-10 w-10 mr-3 text-gray-500 hover:text-gray-700 disabled:opacity-50"
             >
               <Send className="h-5 w-5" />
             </button>

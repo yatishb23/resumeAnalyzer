@@ -2,7 +2,7 @@
 
 import { useState, useEffect, type DragEvent, type ChangeEvent, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, FileText, UploadCloud, CheckCircle, X } from "lucide-react"
+import { Loader2, FileText, UploadCloud, CheckCircle} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
@@ -169,9 +169,10 @@ export default function ResumeChecker() {
               onDrop={handleDrop}
               className={cn(
                 "border bg-opacity-50 backdrop-blur-sm transition-all shadow-lg",
-                theme === "dark" , isDragging 
+                theme === "dark" 
                   ? "border-gray-700 bg-gray-800/30 hover:border-gray-600"
                   : "border-gray-200 bg-white/50 hover:border-gray-300",
+                  isDragging ? "" :""
               )}
             >
               <CardContent className="p-8 text-center">
@@ -197,7 +198,7 @@ export default function ResumeChecker() {
                           },
                         }}
                       >
-                        <UploadCloud className={cn("h-8 w-8", theme === "dark" ? "text-gray-300" : "text-gray-600")} />
+                        <UploadCloud className={cn("h-8 w-8", theme === "dark" ? "text-gray-300" : "text-gray-600" )} />
                       </motion.div>
                       <p className={cn(theme === "dark" ? "text-gray-400" : "text-gray-600")}>
                         Drag & drop resume or{" "}

@@ -25,7 +25,6 @@ interface ResumeExample {
 }
 
 const ResumeExamplesPage: React.FC = () => {
-  const { theme, toggleTheme } = useTheme();
 
   const resumeExamples: ResumeExample[] = [
     {

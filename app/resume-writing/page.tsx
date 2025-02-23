@@ -1,5 +1,5 @@
 "use client";
-import React, { JSX, ReactNode } from "react";
+import React from "react";
 import {
   Card,
   CardHeader,
@@ -7,11 +7,9 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
   FileText,
   Target,
-  Award,
   CheckCircle2,
   AlertTriangle,
   Clock,
@@ -19,12 +17,9 @@ import {
   Briefcase,
   ScrollText,
 } from "lucide-react";
-import { NavBar } from "@/components/NavBar";
 import { useTheme } from "@/components/theme";
-import { Link } from "react-router-dom";
 
 const ResumeBlogPage: React.FC = () => {
-  const { theme, toggleTheme } = useTheme();
 
   return (
     <div className="min-h-screen bg-background">

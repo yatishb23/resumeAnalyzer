@@ -8,11 +8,9 @@ import {
   Layout,
   Type,
 } from "lucide-react";
-import { useTheme } from "@/components/theme";
 import Link from "next/link";
 
 const OnePageResumePage: React.FC = () => {
-  const { theme, toggleTheme } = useTheme();
   const [currentTip, setCurrentTip] = useState<number>(0);
 
   const quickTips: string[] = [

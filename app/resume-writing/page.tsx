@@ -17,7 +17,6 @@ import {
   Briefcase,
   ScrollText,
 } from "lucide-react";
-import { useTheme } from "@/components/theme";
 
 const ResumeBlogPage: React.FC = () => {
 

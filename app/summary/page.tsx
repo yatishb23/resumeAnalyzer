@@ -4,14 +4,12 @@ import React from 'react';
 import { Card, CardHeader, CardContent, CardTitle} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Target, Star, BookOpen, Bookmark } from "lucide-react";
-import { useTheme } from "@/components/theme";
 import Link from 'next/link';
 
 const ResumeSummaryPage: React.FC = () => {
-    const { theme, toggleTheme } = useTheme();
 
     interface Feature {
-        icon: any;
+        icon: React.ReactNode;
         title: string;
         description: string;
     }
@@ -38,28 +36,7 @@ const ResumeSummaryPage: React.FC = () => {
         { icon: <Bookmark className="h-6 w-6 text-primary" />, title: "Sets You Apart", description: "Differentiates you from other candidates" }
     ];
 
-    const keyElements: KeyElement[] = [
-        { title: "Your Professional Title", content: "Start with your current role or professional identity", example: "Experienced Digital Marketing Manager with 6+ years of expertise..." },
-        { title: "Years of Experience", content: "Mention your relevant experience in the field", example: "Senior Software Developer with 8+ years of experience..." },
-        { title: "Key Achievements", content: "Include 2-3 notable accomplishments with metrics", example: "...led teams to deliver 15+ successful projects, increasing client satisfaction by 40%" },
-        { title: "Relevant Skills", content: "Highlight skills that match the job requirements", example: "...specializing in cloud architecture, agile methodologies, and team leadership" }
-    ];
-
-    const summaryExamples: SummaryExample[] = [
-        { level: "Entry Level", example: "Recent Computer Science graduate with strong foundation in software engineering and programming principles..." },
-        { level: "Mid-Career Professional", example: "Marketing Manager with 5+ years of experience in developing and executing comprehensive marketing strategies..." },
-        { level: "Senior Professional", example: "Senior Project Manager with 10+ years of experience leading complex IT projects in the healthcare sector..." }
-    ];
-
-    const tips: Tip[] = [
-        { tip: "Keep it concise", description: "Limit your summary to 3-5 impactful sentences" },
-        { tip: "Use relevant keywords", description: "Include industry-specific terms from the job description" },
-        { tip: "Focus on achievements", description: "Highlight quantifiable results and specific accomplishments" },
-        { tip: "Tailor to the job", description: "Customize your summary for each position you apply to" },
-        { tip: "Use active voice", description: "Write with strong, action-oriented language" },
-        { tip: "Stay professional", description: "Maintain a formal tone and avoid personal pronouns" }
-    ];
-
+    
     return (
         <div className="min-h-screen bg-background">
             <div className="relative overflow-hidden bg-gradient-to-b from-primary/10 to-background pb-16 pt-24">

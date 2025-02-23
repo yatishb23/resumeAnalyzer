@@ -169,7 +169,7 @@ export default function ResumeChecker() {
               onDrop={handleDrop}
               className={cn(
                 "border bg-opacity-50 backdrop-blur-sm transition-all shadow-lg",
-                theme === "dark"
+                theme === "dark" , isDragging 
                   ? "border-gray-700 bg-gray-800/30 hover:border-gray-600"
                   : "border-gray-200 bg-white/50 hover:border-gray-300",
               )}

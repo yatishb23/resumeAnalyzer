@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Resume Analyzer
 
-## Getting Started
+Resume Analyzer is a web application designed to help users analyze and improve their resumes. Built with Next.js and TypeScript, it provides actionable insights and feedback on various aspects of resumes—ranging from formatting and grammar to ATS (Applicant Tracking System) scores and style. The platform also features a dashboard for managing resume data, interactive chatbot support, and sections dedicated to resume examples and writing guidance.
 
-First, run the development server:
+## Features
 
+- **Resume Analysis:** Receive detailed feedback on formatting, grammar, skills, and style.
+- **ATS Score & Profile Match:** Evaluate resume compatibility with ATS and compare against job descriptions.
+- **Interactive Dashboard:** Easily view and manage your resume analysis data.
+- **Chatbot Support:** Get interactive help and resume writing tips through our integrated chatbot.
+- **Resume Examples & Writing Tips:** Access curated resume examples and expert writing advice.
+- **User Authentication:** Secure login and signup pages for a personalized experience.
+- **Modern UI:** Clean and responsive design built with Tailwind CSS and custom React components.
+- **API Integration:** Built-in API endpoints for fetching and managing analysis data.
+
+## Installation
+
+### Clone the Repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/yatishb23-resumeanalyzer.git
+cd yatishb23-resumeanalyzer
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Install Dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Run the Development Server:
+```bash
+npm run dev
+```
+The application will be available at [http://localhost:3000](http://localhost:3000).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Usage
 
-## Learn More
+- **Navigation:** Use the navigation bar to access different sections, including the dashboard, resume writing, and examples.
+- **Authentication:** Sign up or log in to securely access personalized resume analysis.
+- **Dashboard:** View detailed insights and feedback for your resume.
+- **Chatbot:** Interact with the chatbot for personalized resume writing tips.
+- **Resume Examples:** Explore provided resume examples and writing guidelines to improve your resume.
 
-To learn more about Next.js, take a look at the following resources:
+## Technologies Used
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [Next.js](https://nextjs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- Custom React Components
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Contributing
 
-## Deploy on Vercel
+Contributions are welcome! To contribute:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Fork the repository.
+2. Create a new branch for your feature or bugfix.
+3. Commit your changes.
+4. Submit a pull request.

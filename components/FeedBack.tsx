@@ -1,25 +1,31 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useTheme } from "./theme";
 import { useScore } from "./Context/FileData";
 import { useJobDescription } from "./Context/JobDec";
-import ATS from "./Content/AtsScore";
-import { Loader2, AlertCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import ProfileMatch from "./Content/ProfileMatch";
-import ResumeContent from "./ResumeContent";
-import SkillsFeedBack from "./SkillsFeedBack";
-import StylesFeedBack from "./StylesFeedBack";
-import FormatFeedBack from "./FormatFeedBack";
-import GrammarFeedBack from "./GrammarFeedBack";
+import Animation from "./animation";
+import { AlertCircle, RefreshCw } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import { MetricsOverview } from "./Content/Metrics";
+import { OverallAssessment } from "./Content/Overall";
+import { ScoreBreakdown } from "./Content/ScoreBreakdown";
+import { KeywordsAnalysis } from "./Content/KeywordAnalysis";
+import { SkillsAssessment } from "./Content/Skills";
+import { DetailedFeedback } from "./Content/DetailedFeedBack";
+import { Recommendations } from "./Content/Recommendation";
 
 interface AnalysisData {
   ATS_score: number;
   issues_count: number;
   matching_percentage: number;
+  matching_keywords: string[];
+  keyword_match: number;
   missing_keywords: {
     hard_skills: string[];
     soft_skills: string[];
@@ -31,7 +37,11 @@ interface AnalysisData {
     areas_for_improvement: string[];
     suggestions: string;
   };
-  skills_rating: number;
+  skills: {
+    skills_rating: number;
+    skills_feedback: string[];
+    matching_skills: string[];
+  };
   content_rating: number;
   grammar_rating: number;
   formatting_rating: number;
@@ -40,7 +50,6 @@ interface AnalysisData {
   formatting_feedback: string[];
   grammar_feedback: string[];
   style_feedback: string[];
-  skills_feedback: string[];
 }
 
 interface ApiError {
@@ -51,14 +60,36 @@ interface ApiError {
 export default function Feedback() {
   const { scoreResult } = useScore();
   const { jobDescription } = useJobDescription();
-  const { theme } = useTheme();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
   const [error, setError] = useState<ApiError | null>(null);
+  const [currentStep, setCurrentStep] = useState(0);
+  const analysisSteps = [1, 2, 3, 4, 5];
 
   const fetchResumeAnalysis = useCallback(async () => {
     try {
+      const stepInterval = setInterval(() => {
+        setCurrentStep((prev) => {
+          if (prev < analysisSteps.length - 1) {
+            return prev + 1;
+          }
+          clearInterval(stepInterval);
+          return prev;
+        });
+      }, 800);
+
+      const cacheKey = "cachedResumeAnalysis";
+      const cached = localStorage.getItem(cacheKey);
+
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        setAnalysis(parsed);
+        clearInterval(stepInterval);
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch("/api/getAllData", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -76,7 +107,10 @@ export default function Feedback() {
       }
 
       data = JSON.parse(data);
+      localStorage.setItem(cacheKey, JSON.stringify(data.resume_analysis));
       setAnalysis(data.resume_analysis);
+
+      clearInterval(stepInterval);
     } catch (err) {
       setError({
         message: err instanceof Error ? err.message : "Unknown error occurred",
@@ -84,8 +118,9 @@ export default function Feedback() {
       });
     } finally {
       setLoading(false);
+      setCurrentStep(0);
     }
-  }, [scoreResult, jobDescription]);
+  }, [scoreResult, jobDescription,analysisSteps.length]);
 
   useEffect(() => {
     if (scoreResult) {
@@ -97,136 +132,150 @@ export default function Feedback() {
 
   if (loading) {
     return (
-      <div
-        className={cn(
-          "min-h-screen flex flex-col items-center justify-center pt-16",
-          theme === "dark" ? "bg-[#0D0D0D]" : "bg-gray-50"
-        )}
-      >
-        <Loader2 className="w-12 h-12 animate-spin text-[#007BFF] mb-4" />
-        <p
-          className={cn(
-            "animate-pulse",
-            theme === "dark" ? "text-gray-400" : "text-gray-700"
-          )}
-        >
-          Analyzing your resume...
-        </p>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-black">
+        <Animation />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div
-        className={cn(
-          "min-h-screen flex flex-col items-center justify-center p-4 text-center pt-16",
-          theme === "dark" ? "bg-[#0D0D0D]" : "bg-gray-50"
-        )}
-      >
-        <div
-          className={cn(
-            "max-w-md space-y-4 p-6 rounded-lg shadow-lg border",
-            theme === "dark"
-              ? "bg-[#1A1A1A] border-gray-700"
-              : "bg-white border-gray-300"
-          )}
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-50 dark:bg-black">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="max-w-md w-full space-y-6 text-center"
         >
-          <AlertCircle className="w-12 h-12 mx-auto text-red-500" />
-          <h2
-            className={cn(
-              "text-xl font-semibold",
-              theme === "dark" ? "text-white" : "text-gray-900"
-            )}
-          >
-            Analysis Failed
-          </h2>
-          <p
-            className={cn(theme === "dark" ? "text-gray-400" : "text-gray-600")}
-          >
-            {error.message}
-          </p>
-          <button
+          <div className="w-16 h-16 mx-auto rounded-full bg-red-50 dark:bg-red-950/20 flex items-center justify-center">
+            <AlertCircle className="w-8 h-8 text-red-500 dark:text-red-400" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+              Analysis Failed
+            </h2>
+            <p className="text-slate-600 dark:text-slate-400 text-sm">
+              {error.message}
+            </p>
+          </div>
+          <Button
             onClick={() => window.location.reload()}
-            className="mt-4 px-6 py-2 bg-[#007BFF] text-white rounded-lg hover:bg-[#0056b3] transition-all"
+            className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-black dark:hover:bg-slate-200"
+            size="lg"
           >
+            <RefreshCw className="w-4 h-4 mr-2" />
             Try Again
-          </button>
-        </div>
+          </Button>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div
-      className={cn(
-        "min-h-screen w-full pt-16 flex flex-col",
-        theme === "dark" ? "bg-[#0D0D0D]" : "bg-gray-50"
-      )}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-background"
     >
-      <div className="flex-1 container mx-auto p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-[400px,1fr] gap-8">
-          {analysis && (
-            <>
-              {/* Left Column */}
-              <div className="flex flex-col gap-3">
-                <div
-                  className={cn(
-                    "pt-6 pl-6 pr-6 rounded-xl shadow-lg border",
-                    theme === "dark"
-                      ? "bg-[#1A1A1A] border-gray-700"
-                      : "bg-white border-gray-300"
-                  )}
-                >
-                  <div className="mb-8 space-y-4">
-                    <motion.h2
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={cn(
-                        "text-2xl font-bold text-center",
-                        theme === "dark" ? "text-white" : "text-gray-900"
-                      )}
-                    >
-                      ATS Score
-                    </motion.h2>
-                    <ATS
-                      score={analysis.ATS_score || 0}
-                      issues={analysis.issues_count || 0}
-                      skills={analysis.skills_rating || 0}
-                      content={analysis.content_rating || 0}
-                      grammar={analysis.grammar_rating || 0}
-                      format={analysis.formatting_rating || 0}
-                      style={analysis.style_rating || 0}
-                    />
-                  </div>
-                </div>
-              </div>
+      {analysis && (
+        <div className="container mx-auto px-6 py-8 max-w-7xl pt-24">
+          {/* Header with Theme Toggle */}
+          <div className="mb-8 flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
+                Resume Analysis Dashboard
+              </h1>
+              <p className="text-slate-600 dark:text-slate-400">
+                Comprehensive analysis of your resume&apos;s ATS compatibility
+                and job match
+              </p>
+            </div>
+          </div>
 
-              {/* Right Column */}
-              <div
-                className={cn(
-                  "rounded-xl shadow-lg border overflow-y-auto p-6",
-                  theme === "dark"
-                    ? "h-[calc(100vh-6.5rem)] bg-[#1A1A1A] border-gray-700"
-                    : "h-[calc(100vh-6.5rem)] bg-white border-gray-300"
-                )}
-              >
-                <ProfileMatch
-                  score={analysis.matching_percentage}
-                  feedback={analysis.job_description_analysis}
-                  keyword={analysis.missing_keywords}
-                />
-                {/* Uncomment and adjust ResumeContent as needed */}
-                <ResumeContent content={analysis.content_feedback} />
-                <SkillsFeedBack content={analysis.skills_feedback} />
-                <StylesFeedBack content={analysis.style_feedback} />
-                <FormatFeedBack content={analysis.formatting_feedback} />
-                <GrammarFeedBack content={analysis.grammar_feedback} />
+          {/* Key Metrics Overview */}
+          <MetricsOverview analysis={analysis} />
+
+          {/* Overall Assessment */}
+          <OverallAssessment score={analysis.ATS_score} />
+
+          {/* Detailed Analysis Tabs */}
+          <Card className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+            <Tabs defaultValue="breakdown" className="w-full">
+              <CardHeader className="pb-0">
+                <TabsList className="grid w-full grid-cols-5 bg-slate-100 dark:bg-neutral-800 h-12">
+                  <TabsTrigger
+                    value="breakdown"
+                    className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900 data-[state=active]:text-slate-900 dark:data-[state=active]:text-white dark:text-neutral-400"
+                  >
+                    Score Breakdown
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="keywords"
+                    className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900 data-[state=active]:text-slate-900 dark:data-[state=active]:text-white dark:text-neutral-400"
+                  >
+                    Keywords Analysis
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="skills"
+                    className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900 data-[state=active]:text-slate-900 dark:data-[state=active]:text-white dark:text-neutral-400"
+                  >
+                    Skills Assessment
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="feedback"
+                    className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900 data-[state=active]:text-slate-900 dark:data-[state=active]:text-white dark:text-neutral-400"
+                  >
+                    Detailed Feedback
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="recommendations"
+                    className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900 data-[state=active]:text-slate-900 dark:data-[state=active]:text-white dark:text-neutral-400"
+                  >
+                    Recommendations
+                  </TabsTrigger>
+                </TabsList>
+              </CardHeader>
+
+              <div className="p-6">
+                <TabsContent value="breakdown" className="mt-0 space-y-6">
+                  <ScoreBreakdown analysis={analysis} />
+                </TabsContent>
+
+                <TabsContent value="keywords" className="mt-0 space-y-6">
+                  <KeywordsAnalysis analysis={analysis} />
+                </TabsContent>
+
+                <TabsContent value="skills" className="mt-0 space-y-6">
+                  <SkillsAssessment analysis={analysis} />
+                </TabsContent>
+
+                <TabsContent value="feedback" className="mt-0 space-y-6">
+                  <DetailedFeedback analysis={analysis} />
+                </TabsContent>
+
+                <TabsContent value="recommendations" className="mt-0 space-y-6">
+                  <Recommendations analysis={analysis} />
+                </TabsContent>
               </div>
-            </>
-          )}
+            </Tabs>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mt-4">
+              Step {currentStep + 1} of {analysisSteps.length}
+            </p>
+          </Card>
         </div>
-      </div>
-    </div>
+      )}
+
+      {/* <Button
+        variant="outline"
+        className="fixed bottom-6 right-6 z-50 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+        onClick={() => {
+          localStorage.removeItem("cachedResumeAnalysis");
+          window.location.reload();
+        }}
+      >
+        <RefreshCw className="w-4 h-4 mr-2" />
+        Refresh Analysis
+      </Button> */}
+    </motion.div>
   );
 }

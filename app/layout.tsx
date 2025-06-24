@@ -1,16 +1,12 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { ThemeProvider } from "@/components/theme";
-import { NavBar } from "@/components/NavBar";
 import "./globals.css";
+import { NavBar } from "@/components/NavBar";
+import { ThemeProvider } from "@/components/theme-provider";
 import { JobDescriptionProvider } from "@/components/Context/JobDec";
 import { ScoreProvider } from "@/components/Context/FileData";
 
-const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
+export const metadata = {
   title: "ScaleUp",
-  description: "AI-powered resume analysis and optimization tool",
+  description: "Product Designer & Developer",
 };
 
 export default function RootLayout({
@@ -19,19 +15,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className} suppressHydrationWarning>
-        <ThemeProvider>
-          <JobDescriptionProvider>
-            <ScoreProvider>
-              <div className="min-h-screen">
+    <>
+      <html lang="en" suppressHydrationWarning>
+        <head />
+        <body>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <JobDescriptionProvider>
+              <ScoreProvider>
                 <NavBar />
-                <main>{children}</main>
-              </div>
-            </ScoreProvider>
-          </JobDescriptionProvider>
-        </ThemeProvider>
-      </body>
-    </html>
+                {children}
+              </ScoreProvider>
+            </JobDescriptionProvider>
+          </ThemeProvider>
+        </body>
+      </html>
+    </>
   );
 }

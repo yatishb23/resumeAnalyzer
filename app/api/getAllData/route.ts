@@ -30,8 +30,12 @@ export async function POST(req: NextRequest) {
     "formatting_feedback": [<array of string>],
     "grammar_rating": <integer 0-100>,
     "grammar_feedback": [<array of string>],
-    "skills_rating": <integer 0-100>,
-    "skills_feedback": [<array of string>],
+    "skills":{
+      "skills_rating": <integer 0-100>,
+      "skills_feedback": [<array of string>],
+      "matching_skills":[<array of string>],
+    },
+    "keyword_match":<integer 0-100>,
     "style_rating": <integer 0-100>,
     "style_feedback": [<array of string>],
     "matching_percentage": <integer 0-100>,
@@ -46,13 +50,14 @@ export async function POST(req: NextRequest) {
       "certifications": [<array of strings>],
       "tools_technologies": [<array of strings>],
       "total_missing_keywords": <integer>
-    }
+    },
+    "matching_keywords":[<array of strings>],
   }
 }
 
 Task Instructions:
 1. Evaluate the resume against standard ATS criteria and the job description
-2. Calculate scores for each category (content, formatting, grammar, skills, style)
+2. Calculate scores for each category (content, formatting, grammar, skills, style ,keyword matching)
 3. Identify missing keywords across different categories
 4. Provide specific, actionable feedback in each feedback field
 5. Ensure all numeric values are within their specified ranges
@@ -60,6 +65,7 @@ Task Instructions:
 7. Include only relevant issues in the issues array
 8. Calculate total missing keywords as sum of all missing keyword arrays
 9. Ensure matching_percentage reflects overall resume-job fit
+10. Calculate total missing keywords as sum of all missing keyword arrays
 
 Remember: 
 - All output must be in valid JSON format

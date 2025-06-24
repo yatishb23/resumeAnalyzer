@@ -1,105 +1,157 @@
 "use client";
 
-import { useState, FormEvent } from "react";
-import { useTheme } from "@/components/theme";
+import type React from "react";
+
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 
 export default function Login() {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const { theme } = useTheme();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
 
-  const handleLogin = (e: FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Logging in with:", { email, password });
+    console.log("Logging in with:", { email, password, rememberMe });
     router.push("/");
   };
 
   return (
-    <div
-      className={`h-screen flex items-center justify-center px-4 transition-all ${
-        theme === "light"
-          ? "bg-gradient-to-br from-gray-100 to-white"
-          : "bg-gradient-to-br from-gray-900 to-gray-800"
-      }`}
-    >
-      <div
-        className={`w-full max-w-md p-8 rounded-lg shadow-lg ${
-          theme === "light" ? "bg-white" : "bg-gray-900"
-        }`}
-      >
-        <h2 className="text-2xl font-bold text-center mb-6">Sign in to your account</h2>
-
-        {/* Social Login */}
-        <div className="space-y-4">
-          {["linkedin", "google", "facebook"].map((provider) => (
-            <button
-              key={provider}
-              className="flex items-center justify-center gap-2 w-full border rounded-lg px-4 py-2 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              <Image src={`/${provider}.png`} alt={provider} width={20} height={20} />
-              <span>{provider.charAt(0).toUpperCase() + provider.slice(1)}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white dark:bg-gray-900 text-gray-500">OR</span>
-          </div>
-        </div>
-
-        {/* Login Form */}
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Your Email"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-              required
-            />
-          </div>
-          <div>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-lg py-2 font-medium transition"
-          >
-            Log In
-          </button>
-        </form>
-
-        <div className="mt-4 text-center">
-          <Link href="#" className="text-purple-600 hover:underline">
-            Forgot your password?
-          </Link>
-          <p className="text-gray-600 dark:text-gray-300 mt-2">
-            First time here?{" "}
-            <button
-              onClick={() => router.push("/signup")}
-              className="text-purple-600 hover:underline"
-            >
-              Create an account
-            </button>
+    <div className="flex min-h-screen items-center justify-center px-4 sm:px-6 lg:px-8 bg-background">
+      <Card className="w-full max-w-md bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-2xl font-bold text-slate-900 dark:text-white">
+            Welcome back
+          </CardTitle>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">
+            Enter your credentials to access your account
           </p>
-        </div>
-      </div>
+        </CardHeader>
+
+        <CardContent className="space-y-6">
+          {/* Social Login */}
+          <div className="space-y-3">
+            <Button
+              variant="outline"
+              className="w-full bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-900 dark:text-white"
+            >
+              <div className="flex items-center justify-center gap-2">
+                <Image
+                  src="/linkedin.png"
+                  alt="LinkedIn"
+                  width={20}
+                  height={20}
+                  className="w-5 h-5 bg-neutral-200 dark:bg-neutral-700 rounded"
+                />
+                <span>Continue with LinkedIn</span>
+              </div>
+            </Button>
+
+            <Button
+              variant="outline"
+              className="w-full bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-900 dark:text-white"
+            >
+              <div className="flex items-center justify-center gap-2">
+                <Image
+                  src="/google.png"
+                  alt="LinkedIn"
+                  width={20}
+                  height={20}
+                  className="w-5 h-5 bg-neutral-200 dark:bg-neutral-700 rounded"
+                />
+                <span>Continue with Google</span>
+              </div>
+            </Button>
+          </div>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <Separator className="w-full bg-neutral-200 dark:bg-neutral-700" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white dark:bg-neutral-900 px-2 text-neutral-500 dark:text-neutral-400">
+                OR
+              </span>
+            </div>
+          </div>
+
+          {/* Login Form */}
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Input
+                type="email"
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 text-neutral-900 dark:text-white placeholder:text-neutral-500 dark:placeholder:text-neutral-400 focus:border-neutral-400 dark:focus:border-neutral-600"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 text-neutral-900 dark:text-white placeholder:text-neutral-500 dark:placeholder:text-neutral-400 focus:border-neutral-400 dark:focus:border-neutral-600"
+              />
+            </div>
+
+            {/* Remember Me and Forgot Password */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="remember"
+                  checked={rememberMe}
+                  onCheckedChange={() => setRememberMe(true)}
+                  className="border-neutral-300 dark:border-neutral-700 data-[state=checked]:bg-neutral-900 dark:data-[state=checked]:bg-white data-[state=checked]:border-neutral-900 dark:data-[state=checked]:border-white"
+                />
+                <label
+                  htmlFor="remember"
+                  className="text-sm text-neutral-600 dark:text-neutral-400 leading-none"
+                >
+                  Remember me
+                </label>
+              </div>
+              <Link
+                href="/forgot-password"
+                className="text-sm text-neutral-900 dark:text-white hover:underline font-medium"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black font-medium"
+            >
+              Sign In
+            </Button>
+          </form>
+
+          <div className="text-center">
+            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+              Don&apos;t have an account?{" "}
+              <Link
+                href="/signup"
+                className="text-neutral-900 dark:text-white hover:underline font-medium"
+              >
+                Sign up
+              </Link>
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

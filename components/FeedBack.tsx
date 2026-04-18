@@ -93,12 +93,28 @@ export default function Feedback() {
       const payload = await response.json();
       console.log(payload);
 
-      const normalizedData =
-        typeof payload === "string"
-          ? JSON.parse(
-              payload.replace(/^```json\s*/i, "").replace(/```\s*$/i, ""),
-            )
-          : payload;
+      const normalizedData = (() => {
+        if (typeof payload !== "string") return payload;
+
+        const cleaned = payload
+          .replace(/^```json\s*/i, "")
+          .replace(/^```\s*/i, "")
+          .replace(/```\s*$/i, "")
+          .trim();
+
+        try {
+          return JSON.parse(cleaned);
+        } catch {
+          const start = cleaned.indexOf("{");
+          const end = cleaned.lastIndexOf("}");
+
+          if (start !== -1 && end !== -1 && end > start) {
+            return JSON.parse(cleaned.slice(start, end + 1));
+          }
+
+          throw new Error(cleaned || "Analysis service returned invalid data");
+        }
+      })();
 
       setAnalysis(normalizedData.resume_analysis ?? normalizedData);
 

@@ -15,7 +15,11 @@ const isRetryableError = (error: unknown) => {
   return RETRYABLE_ERROR_PATTERN.test(message);
 };
 
-const withRetry = async <T>(operation: () => Promise<T>, attempts = 3) => {
+const withRetry = async (
+  operation: () => Promise<any>,
+  attempts = 3,
+  baseDelayMs = 1000,
+) => {
   let lastError: unknown;
 
   for (let attempt = 1; attempt <= attempts; attempt++) {
@@ -28,7 +32,7 @@ const withRetry = async <T>(operation: () => Promise<T>, attempts = 3) => {
         throw error;
       }
 
-      await delay(1000 * attempt);
+      await delay(baseDelayMs * attempt);
     }
   }
 
@@ -114,11 +118,14 @@ TASK INSTRUCTIONS:
     },
   ];
 
-  const response = await withRetry(() =>
-    ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: contents,
-    }),
+  const response = await withRetry(
+    () =>
+      ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: contents,
+      }),
+    2,
+    600,
   );
 
   return response.text;

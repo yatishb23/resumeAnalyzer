@@ -1,127 +1,129 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import { useScore } from "./Context/FileData"
-import { useJobDescription } from "./Context/JobDec"
-import { motion } from "framer-motion"
-import { useRouter } from "next/navigation"
-import Animation from "./animation"
-import { AlertCircle, RefreshCw } from "lucide-react"
+import { useState, useEffect, useCallback } from "react";
+import { useScore } from "./Context/FileData";
+import { useJobDescription } from "./Context/JobDec";
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import Animation from "./animation";
+import { AlertCircle, RefreshCw } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardHeader } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { MetricsOverview } from "./Content/Metrics"
-import { OverallAssessment } from "./Content/Overall"
-import { ScoreBreakdown } from "./Content/ScoreBreakdown"
-import { KeywordsAnalysis } from "./Content/KeywordAnalysis"
-import { SkillsAssessment } from "./Content/Skills"
-import { DetailedFeedback } from "./Content/DetailedFeedBack"
-import { Recommendations } from "./Content/Recommendation"
+import { MetricsOverview } from "./Content/Metrics";
+import { OverallAssessment } from "./Content/Overall";
+import { ScoreBreakdown } from "./Content/ScoreBreakdown";
+import { KeywordsAnalysis } from "./Content/KeywordAnalysis";
+import { SkillsAssessment } from "./Content/Skills";
+import { DetailedFeedback } from "./Content/DetailedFeedBack";
+import { Recommendations } from "./Content/Recommendation";
 
 interface AnalysisData {
-  ATS_score: number
-  issues_count: number
-  matching_percentage: number
-  matching_keywords: string[]
-  keyword_match: number
+  ATS_score: number;
+  issues_count: number;
+  matching_percentage: number;
+  matching_keywords: string[];
+  keyword_match: number;
   missing_keywords: {
-    hard_skills: string[]
-    soft_skills: string[]
-    tools_technologies: string[]
-    total_missing_keywords: number
-  }
+    hard_skills: string[];
+    soft_skills: string[];
+    tools_technologies: string[];
+    total_missing_keywords: number;
+  };
   job_description_analysis: {
-    key_strengths: string[]
-    areas_for_improvement: string[]
-    suggestions: string
-  }
+    key_strengths: string[];
+    areas_for_improvement: string[];
+    suggestions: string;
+  };
   skills: {
-    skills_rating: number
-    skills_feedback: string[]
-    matching_skills: string[]
-  }
-  content_rating: number
-  grammar_rating: number
-  formatting_rating: number
-  style_rating: number
-  content_feedback: string[]
-  formatting_feedback: string[]
-  grammar_feedback: string[]
-  style_feedback: string[]
+    skills_rating: number;
+    skills_feedback: string[];
+    matching_skills: string[];
+  };
+  content_rating: number;
+  grammar_rating: number;
+  formatting_rating: number;
+  style_rating: number;
+  content_feedback: string[];
+  formatting_feedback: string[];
+  grammar_feedback: string[];
+  style_feedback: string[];
 }
 
 interface ApiError {
-  message: string
-  details?: string
+  message: string;
+  details?: string;
 }
 
 export default function Feedback() {
-  const { scoreResult } = useScore()
-  const { jobDescription } = useJobDescription()
-  const router = useRouter()
-  const [loading, setLoading] = useState(true)
-  const [analysis, setAnalysis] = useState<AnalysisData | null>(null)
-  const [error, setError] = useState<ApiError | null>(null)
-  const [currentStep, setCurrentStep] = useState(0)
-  const analysisSteps = [1, 2, 3, 4, 5]
+  const { base64String } = useScore();
+  const { jobDescription } = useJobDescription();
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
+  const [error, setError] = useState<ApiError | null>(null);
+  const [currentStep, setCurrentStep] = useState(0);
+  const analysisSteps = [1, 2, 3, 4, 5];
 
   const fetchResumeAnalysis = useCallback(async () => {
     try {
       const stepInterval = setInterval(() => {
         setCurrentStep((prev) => {
           if (prev < analysisSteps.length - 1) {
-            return prev + 1
+            return prev + 1;
           }
-          clearInterval(stepInterval)
-          return prev
-        })
-      }, 800)
+          clearInterval(stepInterval);
+          return prev;
+        });
+      }, 800);
 
       const response = await fetch("/api/getAllData", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ scoreResult, jobDescription }),
-      })
+        body: JSON.stringify({ base64String, jobDescription }),
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Analysis failed")
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Analysis failed");
       }
 
-      let data = await response.json()
-      console.log(data)
+      const payload = await response.json();
+      console.log(payload);
 
-      if (typeof data === "string" && data.length > 6) {
-        data = data.slice(7, -4)
-      }
+      const normalizedData =
+        typeof payload === "string"
+          ? JSON.parse(
+              payload.replace(/^```json\s*/i, "").replace(/```\s*$/i, ""),
+            )
+          : payload;
 
-      data = JSON.parse(data)
-      setAnalysis(data.resume_analysis)
+      setAnalysis(normalizedData.resume_analysis ?? normalizedData);
 
-      clearInterval(stepInterval)
+      clearInterval(stepInterval);
     } catch (err) {
       setError({
         message: err instanceof Error ? err.message : "Unknown error occurred",
         details: err instanceof Error ? err.stack : undefined,
-      })
+      });
     } finally {
-      setLoading(false)
-      setCurrentStep(0)
+      setLoading(false);
+      setCurrentStep(0);
     }
-  }, [scoreResult, jobDescription, analysisSteps.length])
+  }, [base64String, jobDescription, analysisSteps.length]);
 
   useEffect(() => {
-    if (scoreResult) {
-      fetchResumeAnalysis()
+    if (base64String) {
+      fetchResumeAnalysis();
     } else {
-      router.push("/")
+      router.push("/");
     }
-  }, [scoreResult, fetchResumeAnalysis, router])
+  }, [base64String, fetchResumeAnalysis, router]);
 
   if (loading) {
-    return <Animation />
+    return <Animation />;
   }
 
   if (error) {
@@ -136,8 +138,12 @@ export default function Feedback() {
             <AlertCircle className="w-8 h-8 text-red-500 dark:text-red-400" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Analysis Failed</h2>
-            <p className="text-slate-600 dark:text-slate-400 text-sm">{error.message}</p>
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+              Analysis Failed
+            </h2>
+            <p className="text-slate-600 dark:text-slate-400 text-sm">
+              {error.message}
+            </p>
           </div>
           <Button
             onClick={() => window.location.reload()}
@@ -152,7 +158,7 @@ export default function Feedback() {
           Step {currentStep + 1} of {analysisSteps.length}
         </p>
       </div>
-    )
+    );
   }
 
   return (
@@ -171,7 +177,8 @@ export default function Feedback() {
                 Resume Analysis Dashboard
               </h1>
               <p className="text-slate-600 dark:text-slate-400">
-                Comprehensive analysis of your resume&apos;s ATS compatibility and job match
+                Comprehensive analysis of your resume&apos;s ATS compatibility
+                and job match
               </p>
             </div>
           </div>
@@ -258,5 +265,5 @@ export default function Feedback() {
         Refresh Analysis
       </Button> */}
     </motion.div>
-  )
+  );
 }

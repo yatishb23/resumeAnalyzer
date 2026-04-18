@@ -1,6 +1,5 @@
 "use client";
 
-import { generateContent } from "@/lib/Summarize"
 import {
   useState,
   useEffect,
@@ -31,13 +30,10 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import mammoth from "mammoth"
 import { useScore } from "@/components/Context/FileData";
 import { useRouter } from "next/navigation";
 import { useJobDescription } from "@/components/Context/JobDec";
 import UploadAlert from "@/components/uploadAlert";
-
-
 
 const features = [
   {
@@ -67,118 +63,111 @@ const features = [
 ];
 
 export default function ResumeAnalyzer() {
-  const [userFile, setUserFile] = useState<File | null>(null)
-  const [isDragging, setIsDragging] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [isEvaluateButtonDisabled, setIsEvaluateButtonDisabled] = useState(true)
-  const [done, setDone] = useState(false)
-  const router = useRouter()
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const { jobDescription, setJobDescription } = useJobDescription()
-  const { setScoreResult } = useScore()
+  const [userFile, setUserFile] = useState<File | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isEvaluateButtonDisabled, setIsEvaluateButtonDisabled] =
+    useState(true);
+  const [done, setDone] = useState(false);
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { jobDescription, setJobDescription } = useJobDescription();
+  const { setBase64String } = useScore();
 
   useEffect(() => {
-    setIsEvaluateButtonDisabled(!(userFile && jobDescription.trim().length > 0))
-  }, [userFile, jobDescription])
+    setIsEvaluateButtonDisabled(
+      !(userFile && jobDescription.trim().length > 0),
+    );
+  }, [userFile, jobDescription]);
 
   const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    setIsDragging(true)
-  }
+    event.preventDefault();
+    setIsDragging(true);
+  };
 
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    setIsDragging(false)
-    const droppedFile = event.dataTransfer.files[0]
-    if (droppedFile) setUserFile(droppedFile)
-  }
+    event.preventDefault();
+    setIsDragging(false);
+    const droppedFile = event.dataTransfer.files[0];
+    if (droppedFile) setUserFile(droppedFile);
+  };
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0]
-    if (selectedFile){
-      setUserFile(selectedFile)
-      await processFile(selectedFile)
-    } 
-  }
+    const selectedFile = event.target.files?.[0];
+    if (selectedFile) {
+      setUserFile(selectedFile);
+      await processFile(selectedFile);
+    }
+  };
 
   const handleOpenPdf = () => {
     if (userFile) {
-      const url = URL.createObjectURL(userFile)
-      window.open(url, "_blank")
+      const url = URL.createObjectURL(userFile);
+      window.open(url, "_blank");
     }
-  }
+  };
 
   const handleCancel = () => {
-    setUserFile(null)
+    setUserFile(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = ""
+      fileInputRef.current.value = "";
     }
-  }
+  };
 
   const processFile = async (file: File) => {
     try {
-      const fileType = file.type
-      const isPdf = fileType === "application/pdf"
-      const isDocx = fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      const fileType = file.type;
+      const isPdf = fileType === "application/pdf";
+      const isDocx =
+        fileType ===
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
       if (!isPdf && !isDocx) {
-        throw new Error("Unsupported file format. Please upload a PDF or DOCX file.")
+        throw new Error(
+          "Unsupported file format. Please upload a PDF or DOCX file.",
+        );
       }
 
-      let extractedText = ""
-
-      if (isDocx) {
-        extractedText = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader()
-          reader.onload = async (event) => {
-            if (event.target?.result) {
-              try {
-                const result = await mammoth.extractRawText({
-                  arrayBuffer: event.target.result as ArrayBuffer,
-                })
-                resolve(result.value.trim())
-              } catch {
-                reject("Failed to extract text from DOCX")
-              }
-            } else {
-              reject("Failed to read DOCX file")
-            }
+      // Read file as ArrayBuffer and convert to base64
+      const fileBuffer = await new Promise<ArrayBuffer>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          if (event.target?.result) {
+            resolve(event.target.result as ArrayBuffer);
+          } else {
+            reject("Failed to read file");
           }
-          reader.onerror = (error) => reject(error)
-          reader.readAsArrayBuffer(file)
-        })
-      }
+        };
+        reader.onerror = (error) => reject(error);
+        reader.readAsArrayBuffer(file);
+      });
 
-      const scoreResult = await generateContent([
-        extractedText,
-        "Please perform Optical Character Recognition (OCR) on the provided resume file. Extract and return only the text content, ensuring it is clean, accurate, and free from formatting or additional information.",
-      ])
+      const base64 = Buffer.from(fileBuffer).toString("base64");
 
-      setScoreResult(scoreResult)
-      setDone(true)
+      setBase64String(base64);
+      setDone(true);
     } catch (error) {
-      console.error("Error:", error instanceof Error ? error.message : error)
+      console.error("Error:", error instanceof Error ? error.message : error);
     }
-  }
+  };
 
   const handleEvaluateClick = async () => {
     if (userFile && jobDescription.trim()) {
-      setIsLoading(true)
+      setIsLoading(true);
 
       try {
         for (let i = 0; i < 2; i++) {
-          await new Promise((resolve) => setTimeout(resolve, 1500))
+          await new Promise((resolve) => setTimeout(resolve, 1500));
         }
-        if(!done) await processFile(userFile)
-        router.push("/dashboard")
+        if (!done) await processFile(userFile);
+        router.push("/dashboard");
       } catch (error) {
-        console.error("Error:", error instanceof Error ? error.message : error)
+        console.error("Error:", error instanceof Error ? error.message : error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
-  }
-
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -233,9 +222,7 @@ export default function ResumeAnalyzer() {
               <div
                 className={cn(
                   "border-2 border-dashed rounded-lg p-6 sm:p-8 text-center transition-all duration-200",
-                  isDragging
-                    ? "border-black/40 bg-muted/50"
-                    : "border-border "
+                  isDragging ? "border-black/40 bg-muted/50" : "border-border ",
                 )}
                 onDragOver={handleDragOver}
                 onDragLeave={handleCancel}
@@ -404,7 +391,6 @@ export default function ResumeAnalyzer() {
             ))}
           </div>
         </section>
-
       </main>
 
       {/* Footer */}

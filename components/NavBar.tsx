@@ -102,7 +102,11 @@ export function NavBar() {
             size="icon"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? (
+              <X className="w-5 h-5" />
+            ) : (
+              <Menu className="w-5 h-5" />
+            )}
           </Button>
           <ModeToggle />
         </div>
@@ -111,13 +115,25 @@ export function NavBar() {
       {/* Mobile Nav */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-white dark:bg-[#0A0A0F] border-t border-gray-200 dark:border-gray-700 shadow-lg px-4 py-4 space-y-4 text-sm">
-          <Link href="/resume" className="block" onClick={() => setMobileMenuOpen(false)}>
+          <Link
+            href="/resume"
+            className="block"
+            onClick={() => setMobileMenuOpen(false)}
+          >
             Resume
           </Link>
-          <Link href="/cover-letter" className="block" onClick={() => setMobileMenuOpen(false)}>
+          <Link
+            href="/cover-letter"
+            className="block"
+            onClick={() => setMobileMenuOpen(false)}
+          >
             Cover Letter
           </Link>
-          <Link href="/pricing" className="block" onClick={() => setMobileMenuOpen(false)}>
+          <Link
+            href="/pricing"
+            className="block"
+            onClick={() => setMobileMenuOpen(false)}
+          >
             Pricing
           </Link>
           <button
@@ -129,7 +145,11 @@ export function NavBar() {
           >
             Ask AI
           </button>
-          <Link href="/login" className="block" onClick={() => setMobileMenuOpen(false)}>
+          <Link
+            href="/login"
+            className="block"
+            onClick={() => setMobileMenuOpen(false)}
+          >
             Log In
           </Link>
           <Button
@@ -147,7 +167,9 @@ export function NavBar() {
       {/* Resume Dropdown */}
       <div
         className={`absolute top-full left-0 w-full bg-white dark:bg-gray-900 shadow-lg border-t border-gray-200 dark:border-gray-700 transform transition-all duration-300 ${
-          isResumeOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"
+          isResumeOpen
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 -translate-y-4 pointer-events-none"
         }`}
         onMouseLeave={() => setIsResumeOpen(false)}
       >
@@ -157,7 +179,9 @@ export function NavBar() {
       {/* Cover Letter Dropdown */}
       <div
         className={`absolute top-full left-0 w-full bg-white dark:bg-gray-900 shadow-lg border-t border-gray-200 dark:border-gray-700 transform transition-all duration-300 ${
-          isCoverLetterOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"
+          isCoverLetterOpen
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 -translate-y-4 pointer-events-none"
         }`}
         onMouseLeave={() => setIsCoverLetterOpen(false)}
       >

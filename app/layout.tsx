@@ -3,6 +3,7 @@ import { NavBar } from "@/components/NavBar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { JobDescriptionProvider } from "@/components/Context/JobDec";
 import { ScoreProvider } from "@/components/Context/FileData";
+import { Analytics } from "@vercel/analytics/next"
 
 export const metadata = {
   title: "ScaleUp",
@@ -19,6 +20,7 @@ export default function RootLayout({
       <html lang="en" suppressHydrationWarning>
         <head />
         <body>
+          <Analytics/>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
